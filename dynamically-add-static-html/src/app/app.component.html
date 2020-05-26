@@ -1,0 +1,19 @@
+<div>
+  Choose file:
+  <button
+    *ngFor="let file of files"
+    (click)="selectFile(file)">
+    {{file}}
+  </button>
+</div>
+
+<div>
+  <button (click)="toggleIsTrusted()">Toggle safe mode</button>{{trustSource ? 'You are not safe do not load dangerous files!' : 'You are safe now'}}
+</div>
+<div>
+  Here is your file:
+  <ng-container *ngIf="selectedFile">
+    <article *appStaticHtml="selectedFile;trusted:trustSource"></article>
+  </ng-container>
+</div>
+
