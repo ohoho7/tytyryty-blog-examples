@@ -2,10 +2,7 @@ import {
   Directive, TemplateRef, ViewContainerRef, Input, Renderer2,
   OnChanges, SimpleChanges, OnInit
 } from '@angular/core';
-import {HttpClient} from "@angular/common/http";
-import {DomSanitizer} from "@angular/platform-browser";
-import {Observable} from "rxjs";
-import {map} from "rxjs/internal/operators";
+import {StaticHtmlService} from "./static-html.service";
 
 @Directive({
   selector: '[appStaticHtml]'
@@ -18,11 +15,10 @@ export class StaticHtmlDirective implements OnInit, OnChanges {
   appStaticHtmlTrusted: boolean;
 
   constructor(
-    private httpClient: HttpClient,
-    private domSanitizer: DomSanitizer,
     private renderer: Renderer2,
     private templateRef: TemplateRef<any>,
     private viewContainer: ViewContainerRef,
+    private staticHtmlService: StaticHtmlService
   ) { }
 
   ngOnInit(): void {
@@ -30,30 +26,16 @@ export class StaticHtmlDirective implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if(changes['appStaticHtml'].firstChange) {
+    if(!this.appStaticHtml) {
       return;
     }
     this.insertStaticView();
   }
 
   private insertStaticView(): void {
-    this.getStaticHTML().pipe(
-      map(response => this.mapStaticHtml(response))
-    ).subscribe(response => {
-      this.replaceHtml(response);
-    });
-  }
-
-  private getStaticHTML(): Observable<string> {
-    return this.httpClient.get(this.appStaticHtml, {
-      responseType: 'text'
-    });
-  }
-
-  private mapStaticHtml(htmlString: string): string {
-    return this.appStaticHtmlTrusted ?
-      htmlString :
-      this.domSanitizer.bypassSecurityTrustUrl(htmlString)['changingThisBreaksApplicationSecurity'];
+    this.staticHtmlService
+      .getStaticHTML(this.appStaticHtml, this.appStaticHtmlTrusted)
+      .subscribe(response => { this.replaceHtml(response )});
   }
 
   private replaceHtml(innerHTML: string): void {

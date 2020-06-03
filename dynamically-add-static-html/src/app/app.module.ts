@@ -4,11 +4,13 @@ import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
 import { StaticHtmlDirective } from './static-html.directive';
 import {HttpClientModule} from "@angular/common/http";
+import { StaticHtmlComponent } from './static-html/static-html.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    StaticHtmlDirective
+    StaticHtmlDirective,
+    StaticHtmlComponent
   ],
   imports: [
     BrowserModule,
